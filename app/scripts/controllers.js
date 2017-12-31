@@ -99,8 +99,7 @@ angular.module('confusionApp')
   $scope.dish = dish;
 
 
-  $scope.comment = {rating:"",comment:"",author:"",date:""};
-  $scope.comment.rating = 5;
+  $scope.comment = {rating:5,comment:"",author:"",date:""};
   
   $scope.submitComment = function() {
     
@@ -118,5 +117,30 @@ angular.module('confusionApp')
     console.log($scope.comment);
   };
 }])
+
+  .controller('IndexController',['$scope','$stateParams','menuFactory','corporateFactory', function($scope,$stateParams,menuFactory,corporateFactory) {
+
+    var homeDish = menuFactory.getDish(0);
+
+    $scope.homeDish = homeDish;
+
+    
+    var homePromo = menuFactory.getPromotion(0); 
+
+    $scope.homePromo = homePromo;
+
+    
+    $scope.exec = corporateFactory.getLeader(3);
+
+    //need corp
+  
+  }])
+
+  .controller('AboutController',['$scope','corporateFactory', function($scope,corporateFactory) {
+    
+    $scope.execs = corporateFactory.getLeaders();
+
+  
+  }])
 
 ;
