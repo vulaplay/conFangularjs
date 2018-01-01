@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     imagemin = require('gulp-imagemin'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
-    notify = require('gulp-notify'),
+    //notify = require('gulp-notify'),
     cache = require('gulp-cache'),
     changed = require('gulp-changed'),
     rev = require('gulp-rev'),
@@ -22,11 +22,15 @@ gulp.task('jshint', function() {
 });
 
 gulp.task('usemin',['jshint'], function () {
-  return gulp.src('./app/*.html')
+  //return gulp.src('./app/**/*.html')
+  return gulp.src('./app/**/*.html')
       .pipe(usemin({
         css:[minifycss(),rev()],
         js: [ngannotate(),uglify(),rev()]
       }))
+      .on('error', function(e){
+        console.log(e);
+      }) 
       .pipe(gulp.dest('dist/'));
 });
 
@@ -34,8 +38,8 @@ gulp.task('usemin',['jshint'], function () {
 gulp.task('imagemin', function() {
   return del(['dist/images']), gulp.src('app/images/**/*')
     .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
-    .pipe(gulp.dest('dist/images'))
-    .pipe(notify({ message: 'Images task complete' }));
+    .pipe(gulp.dest('dist/images'));
+    //.pipe(notify({ message: 'Images task complete' }));
 });
 
 // Clean

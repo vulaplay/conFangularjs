@@ -26,10 +26,12 @@
     "font-awesome": "~4.4.0",
     "angular": "^1.4.7",
     "angular-route": "1.4.8",
-    "angular-ui-router": "^1.0.12"
+    "angular-ui-router": "^1.0.12",
+    "angular-resource": "1.6.8",
+    "angular-mocks": "^1.6.8"
   },
   "resolutions": {
-    "angular": "1.4.8",
+    "angular": "^1.4.7",
     "angular-route": "1.4.8"
   }
 }

@@ -9,9 +9,20 @@ angular.module('confusionApp')
   $scope.tab = 1;
   $scope.filtText = '';
   $scope.showDetails = false;
+  $scope.showMenu = false;
+  $scope.message = "Loading...";
 
-  $scope.dishes = menuFactory.getDishes();
-  
+  $scope.dishes = menuFactory.getDishes().query(
+    function(response){
+      $scope.dishes = response;
+      $scope.showMenu = true;
+    },
+    function(response){
+      $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+    }
+  ); 
+
+
   //$scope.dishes = dishes;
   //no longer needed with scope as attached to scope above
 
@@ -93,42 +104,85 @@ angular.module('confusionApp')
 
 .controller('DishDetailController',['$scope','$stateParams','menuFactory', function($scope,$stateParams,menuFactory) {
 
-  //var dish = menuFactory.getDish(3);
-  var dish= menuFactory.getDish(parseInt($stateParams.id,10));
   
-  $scope.dish = dish;
+  $scope.showDish = false;
+  $scope.message = "Loading...";
 
+  //var dish = menuFactory.getDish(3);
+  $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
+    .$promise.then(
+    function(response){
+      $scope.dish = response;
+      $scope.showDish = true;
+    },
+    function(response){
+      $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+    }
+  );
 
+  /* .then(
+    function(response){
+
+      $scope.dish = response.data;
+      $scope.showDish = true;
+      console.log(response);
+    },
+    function(response){
+      $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+    }
+  ); */
+  
   $scope.comment = {rating:5,comment:"",author:"",date:""};
   
   $scope.submitComment = function() {
     
-    $scope.comment.date = new Date();
+      $scope.comment.date = new Date();
 
-    //$scope.addNewComment()
-    $scope.dish.comments.push($scope.comment);
-    
-    console.log($scope.dish.comments);
+      //$scope.addNewComment()
+      $scope.dish.comments.push($scope.comment);
+      menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+     console.log($scope.dish.comments);
 
-    $scope.comment = {rating:"",author:"",comment:"",date:""};
-    $scope.comment.rating = 5;
+      $scope.comment = {rating:"",author:"",comment:"",date:""};
+      $scope.comment.rating = 5;
 
-    $scope.commentsForm.$setPristine();
-    console.log($scope.comment);
+      $scope.commentsForm.$setPristine();
+      console.log($scope.comment);
   };
 }])
 
   .controller('IndexController',['$scope','$stateParams','menuFactory','corporateFactory', function($scope,$stateParams,menuFactory,corporateFactory) {
 
-    var homeDish = menuFactory.getDish(0);
+    
+    $scope.showHomeDish = false;
+    $scope.message = "Loading...";
+    
+    $scope.homeDish = menuFactory.getDishes().get({id:0})
+      .$promise.then(
+        function(response){
+          $scope.homeDish = response;
+          $scope.showHomeDish = true;
+        },
+        function(response){
+          $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+        }
+      )
+    ;
+    /* .then(
+      function(response){
+        $scope.homeDish = response.data;
+        $scope.showHomeDish = true;
+      },
+      function(response){
+        $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+      }
+    ); */
 
-    $scope.homeDish = homeDish;
-
+  
     
     var homePromo = menuFactory.getPromotion(0); 
 
     $scope.homePromo = homePromo;
-
     
     $scope.exec = corporateFactory.getLeader(3);
 
