@@ -1,8 +1,13 @@
 
 
     <div class="container"> <!-- initialise the JS objects into collection of objs -->
+        
         <div class="row row-content" ng-controller="MenuController"> <!--specifies the controller for this div, menuCtrl is alias--> 
-            <div class="col-xs-12">
+            
+            <!--error content-->
+            <div class="col-xs-12" id="error-content" ng-if="!showMenu"><h3>{{message}}</h3></div>
+            
+            <div class="col-xs-12" ng-if="showMenu">
                 <button ng-click="toggleDetails()" class="btn btn-xs btn-primary pull-right" type="button">
                   {{showDetails ? 'Hide Details':'Show Details'}}
                 </button>  
@@ -33,7 +38,7 @@
                         <li class="media" ng-repeat="dish in dishes | filter:{category:filtText} |
                          orderBy:'name'"> <!--loop through each item in collection. code within this tag will be repeated for each. Uses dishes object in controller-->
                             <div class="media-left media-middle">
-                                <a ui-sref="app.dishdetails({id: dish._id})">
+                                <a ui-sref="app.dishdetails({id: dish.id})">
                                 <img class="media-object img-thumbnail"
                                  ng-src={{dish.image}} alt="{{dish.name}}">
                                 </a>
