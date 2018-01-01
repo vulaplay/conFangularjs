@@ -67,41 +67,56 @@ angular.module('confusionApp')
 .controller('ContactController', ['$scope', function($scope) {
 
     $scope.feedback = {mychannel:"", firstName:"", lastName:"",
-                       agree:false, email:"" };
+                       agree:false, email:"", datetime:""};
 
     var channels = [{value:"tel", label:"Tel."}, {value:"Email",label:"Email"}];
    
     $scope.channels = channels;
     $scope.invalidChannelSelection = false;
+    
+    
+    $scope.message = "Loading...";
     //also accessable to feebackcontroller
+
 
 }]) 
 
 
-.controller('FeedbackController', ['$scope', function($scope) {
+.controller('FeedbackController', ['$scope','feedbackService', function($scope,feedbackService) {
+
+  $scope.showFeedback = true;
 
   $scope.sendFeedback = function() {
-      console.log($scope.feedback);
-      if ($scope.feedback.agree && 
-        ($scope.feedback.mychannel == "")&& 
-        !$scope.feedback.mychannel) {
-            $scope.invalidChannelSelection = true;
-            console.log('incorrect');
-      } else {
-        $scope.invalidChannelSelection = false;
+    console.log($scope.feedback);
+    if ($scope.feedback.agree && 
+      ($scope.feedback.mychannel == "")&& 
+      !$scope.feedback.mychannel) {
+          $scope.invalidChannelSelection = true;
+          console.log('incorrect');
+    } else {
+      $scope.invalidChannelSelection = false;
 
-        //ajax call to server
-        
-        $scope.feedback = {mychannel:"", firstName:"", lastName:"",
-                           agree:false, email:"" };
-        $scope.feedback.mychannel="";
+      $scope.feedback.datetime = new Date();
+      
+      //ajax call to server
+      feedbackService.submitFeedback().save($scope.feedback,
+          function(response){
+            $scope.feedback = {mychannel:"", firstName:"", lastName:"",agree:false, email:"",datetime:""};
+            $scope.feedback.mychannel="";
 
-        $scope.feedbackForm.$setPristine();
-        console.log($scope.feedback);
-      }
+            $scope.feedbackForm.$setPristine();    
+            console.log($scope.feedback);
+          },
+          function(response){
+            $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+            $scope.showFeedback = false;
+          }
+        ); 
+    }
   };
 }])
 
+//state params provided by ui-router or $stateProvider to pass paramaters?
 .controller('DishDetailController',['$scope','$stateParams','menuFactory', function($scope,$stateParams,menuFactory) {
 
   
@@ -155,6 +170,9 @@ angular.module('confusionApp')
 
     
     $scope.showHomeDish = false;
+    $scope.showHomeExec = false;
+    $scope.showHomePromo = false;
+
     $scope.message = "Loading...";
     
     $scope.homeDish = menuFactory.getDishes().get({id:0})
@@ -178,21 +196,50 @@ angular.module('confusionApp')
       }
     ); */
 
-  
-    
-    var homePromo = menuFactory.getPromotion(0); 
+    //var homePromo = menuFactory.getPromotion(0); 
 
-    $scope.homePromo = homePromo;
+    $scope.homePromo = menuFactory.getPromotions().get({id:0})
+      .$promise.then(
+        function(response){
+          $scope.homePromo = response;
+          $scope.showHomePromo = true;
+        },
+        function(response){
+          $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+        }
+      );
     
-    $scope.exec = corporateFactory.getLeader(3);
+    //$scope.exec = corporateFactory.getLeader(3);
 
+    $scope.exec = corporateFactory.getLeaders().get({id:3})
+      .$promise.then(
+        function(response){
+          $scope.exec = response;
+          $scope.showHomeExec = true;
+        },
+        function(response){
+          $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+        }
+      );
     //need corp
   
   }])
 
   .controller('AboutController',['$scope','corporateFactory', function($scope,corporateFactory) {
     
-    $scope.execs = corporateFactory.getLeaders();
+    //$scope.execs = corporateFactory.getLeaders();
+    $scope.showExecs = false;
+    $scope.message = "Loading...";
+
+    $scope.execs = corporateFactory.getLeaders().query(
+        function(response){
+          $scope.execs = response;
+          $scope.showExecs = true;
+        },
+        function(response){
+          $scope.message = "Dafuq! There's a problem... it's this: "+response.status+" "+response.statusText;
+        }
+      );
 
   
   }])

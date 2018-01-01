@@ -51,7 +51,8 @@
         </div>
 
 
-        <div class="row row-content">
+        <div class="row row-content" ng-if="!showExecs">{{message}}</div>
+        <div class="row row-content" ng-if="showExecs">
             <div class="col-xs-12 col-sm-9">
                 <h2>Corporate Leadership</h2>
                <ul class="media-list" ng-repeat="exec in execs">

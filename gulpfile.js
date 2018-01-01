@@ -13,7 +13,8 @@ var gulp = require('gulp'),
     rev = require('gulp-rev'),
     browserSync = require('browser-sync'),
     ngannotate = require('gulp-ng-annotate'),
-    del = require('del');
+    del = require('del'),
+    debug = require('gulp-debug');;
 
 gulp.task('jshint', function() {
   return gulp.src('app/scripts/**/*.js')
@@ -24,13 +25,15 @@ gulp.task('jshint', function() {
 gulp.task('usemin',['jshint'], function () {
   //return gulp.src('./app/**/*.html')
   return gulp.src('./app/**/*.html')
+    .pipe(debug({title: 'unicorn:'}))
       .pipe(usemin({
         css:[minifycss(),rev()],
         js: [ngannotate(),uglify(),rev()]
       }))
-      .on('error', function(e){
-        console.log(e);
-      }) 
+      
+      //.on('error', function(e){
+        //console.log(e)
+      //}) 
       .pipe(gulp.dest('dist/'));
 });
 
@@ -77,13 +80,18 @@ gulp.task('browser-sync', ['default'], function () {
          baseDir: "dist",
          index: "index.html"
       },
-      reloadDelay: 1000
+      //reloadDelay: 1000 //not in week 4
    });
         // Watch any files in dist/, reload on change
-  gulp.watch(['dist/**']).on('change', browserSync.reload);
+    gulp.watch(['dist/**']).on('change', browserSync.reload);
     });
 
 // Default task
 gulp.task('default', ['clean'], function() {
     gulp.start('usemin', 'imagemin','copyfonts');
 });
+
+gulp.task('clear', function (done) {
+    return cache.clearAll(done);
+});
+
